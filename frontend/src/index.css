@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=DM+Serif+Display:wght@400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background-color: #0c1a12;
+  color: #faf3e0;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Ensure min font size on inputs */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* Global focus styles */
+:focus-visible {
+  outline: 3px solid #4ade80;
+  outline-offset: 3px;
+}
+
+/* Webkit scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111f16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(74, 222, 128, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 222, 128, 0.5);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default button styles */
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Remove default input styles */
+input,
+textarea,
+select {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+/* Ensure touch targets on mobile */
+@media (max-width: 768px) {
+  button,
+  a,
+  input {
+    min-height: 48px;
+  }
+}
+
+/* Animation utilities */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(74, 222, 128, 0.1),
+    transparent
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}

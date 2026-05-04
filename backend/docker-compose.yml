@@ -1,0 +1,70 @@
+services:
+  # PostgreSQL Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: asl_db
+    environment:
+      POSTGRES_USER: asl_user
+      POSTGRES_PASSWORD: asl_password
+      POSTGRES_DB: asl_db
+      TZ: UTC
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U asl_user -d asl_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - asl_network
+    restart: unless-stopped
+
+  # FastAPI Application Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: asl_api
+    environment:
+      DATABASE_URL: postgresql+asyncpg://asl_user:asl_password@db:5432/asl_db
+      SECRET_KEY: dev-secret-key-change-in-production-must-be-32-chars
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_DAYS: 7
+      ADMIN_EMAIL: admin@asl.app
+      ADMIN_PASSWORD: ChangeMe123!
+      LETTER_MODEL_PATH: ml_models/asl_model_full.keras
+      WORD_MODEL_PATH: ml_models/word_model.keras
+      LETTER_LABEL_MAP_PATH: ml_models/label_map.json
+      WORD_LABEL_MAP_PATH: ml_models/word_label_map.json
+      APP_ENV: development
+      LOG_LEVEL: INFO
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000","http://localhost:8000"]'
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml_models:/app/ml_models:ro
+      - ./app:/app/app
+      - ./ml_models:/app/ml_models
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - asl_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  asl_network:
+    driver: bridge
